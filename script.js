@@ -43,9 +43,8 @@ document.querySelectorAll(".toggle-btn").forEach(title => {
   });
 });
 
-// --- PDF generation (force single-page compact layout) ---
+// --- PDF generation (auto-fit to one A4 page) ---
 document.getElementById("download-btn")?.addEventListener("click", () => {
-  // Clone the content to avoid visual changes
   const content = document.getElementById("profile-content").cloneNode(true);
 
   // Keep only 3 entries per section
@@ -54,26 +53,39 @@ document.getElementById("download-btn")?.addEventListener("click", () => {
     entries.forEach((el, i) => i >= 3 && el.remove());
   });
 
-  // Make it compact for one-page layout
-  content.style.padding = "5px";
-  content.style.lineHeight = "1.2";
-  content.style.fontSize = "13px";
-  content.style.width = "100%";
-  content.style.maxWidth = "800px";
-  content.style.margin = "0 auto";
-  content.style.overflow = "hidden";
-  content.style.transform = "scale(0.8)";
-  content.style.transformOrigin = "top left";
+  // Prepare temporary container for measurement
+  const tempContainer = document.createElement("div");
+  tempContainer.style.position = "absolute";
+  tempContainer.style.left = "-9999px";
+  tempContainer.style.top = "0";
+  tempContainer.style.width = "800px";
+  tempContainer.style.padding = "20px";
+  tempContainer.style.background = "white";
+  tempContainer.appendChild(content);
+  document.body.appendChild(tempContainer);
 
-  // Set PDF options
+  // Calculate scale so content fits in one A4 page (≈1122px tall at 96dpi)
+  const a4HeightPx = 1122; // A4 height in px
+  const contentHeight = tempContainer.scrollHeight;
+  const scale = Math.min(1, a4HeightPx / contentHeight);
+
+  // Apply compact scaling styles
+  content.style.transform = `scale(${scale})`;
+  content.style.transformOrigin = "top left";
+  content.style.width = `${100 / scale}%`;
+  content.style.fontSize = "13px";
+  content.style.lineHeight = "1.25";
+  content.style.margin = "0 auto";
+
+  // Define PDF options
   const opt = {
     margin: 0,
     filename: "Daniela-Picao-Portfolio.pdf",
     image: { type: "jpeg", quality: 1 },
     html2canvas: {
-      scale: 3,        // High resolution
-      scrollY: 0,      // Ignore scroll
-      useCORS: true
+      scale: 2,
+      useCORS: true,
+      scrollY: 0
     },
     jsPDF: {
       unit: "in",
@@ -83,21 +95,14 @@ document.getElementById("download-btn")?.addEventListener("click", () => {
     pagebreak: { mode: ['avoid-all'] }
   };
 
-  // Force everything onto one page
+  // Generate the PDF
   html2pdf()
     .set(opt)
-    .from(content)
-    .toPdf()
-    .get('pdf')
-    .then(pdf => {
-      const totalPages = pdf.internal.getNumberOfPages();
-      if (totalPages > 1) {
-        // Scale down slightly more if content overflows
-        pdf.deletePage(2); // Delete second page if accidentally created
-      }
-    })
-    .save();
+    .from(tempContainer)
+    .save()
+    .then(() => tempContainer.remove());
 });
+
 
 
 </script>
