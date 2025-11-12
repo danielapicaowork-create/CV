@@ -69,56 +69,55 @@
     padding-bottom: 1.5rem;
   }
 
-  /* 🌈 Animated Rainbow Download Button */
-  #download-btn {
-    position: relative;
-    margin-top: 1.5rem;
-    padding: 12px 28px;
-    font-size: 14px;
-    font-weight: 500;
-    color: #333; /* dark grey text */
-    background: transparent;
-    border: none;
-    border-radius: 10px;
-    cursor: pointer;
-    z-index: 1;
-    overflow: hidden;
-  }
+ /* 🌈 Snake-like Animated Rainbow Border Button */
+#download-btn {
+  position: relative;
+  margin-top: 1.5rem;
+  padding: 12px 28px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #333; /* dark grey text */
+  background: transparent;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  overflow: hidden;
+  z-index: 1;
+}
 
-  #download-btn::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    padding: 2px; /* stroke thickness */
-    border-radius: 10px;
-    background: linear-gradient(
-      90deg,
-      #ff0055,
-      #ffae00,
-      #00ff6a,
-      #00c3ff,
-      #7a00ff,
-      #ff00c8,
-      #ff0055
-    );
-    background-size: 400% 400%;
-    -webkit-mask:
-      linear-gradient(#fff 0 0) content-box,
-      linear-gradient(#fff 0 0);
-    -webkit-mask-composite: xor;
-            mask-composite: exclude;
-    animation: rainbow 5s linear infinite;
-    z-index: -1;
-  }
+#download-btn::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  padding: 2px; /* border thickness */
+  border-radius: 10px;
+  background: conic-gradient(
+    from 0deg,
+    rgba(255, 0, 85, 1) 0deg,
+    rgba(255, 170, 0, 1) 40deg,
+    rgba(0, 255, 106, 1) 80deg,
+    rgba(0, 195, 255, 1) 120deg,
+    rgba(122, 0, 255, 1) 160deg,
+    rgba(255, 0, 200, 1) 200deg,
+    rgba(255, 0, 85, 0) 360deg
+  );
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+          mask-composite: exclude;
+  animation: rotateSnake 3s linear infinite;
+  z-index: -1;
+}
 
-  @keyframes rainbow {
-    0% { background-position: 0% 50%; }
-    100% { background-position: 400% 50%; }
-  }
+@keyframes rotateSnake {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
 
-  #download-btn:hover::before {
-    filter: brightness(1.2);
-  }
+#download-btn:hover::before {
+  filter: brightness(1.3);
+}
 </style>
 </head>
 
