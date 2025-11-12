@@ -1,6 +1,23 @@
+# macOS system files
 .DS_Store
+
+# Dependency folders (safe even if unused)
 node_modules/
+
+# Environment variables (not needed now, but useful if you ever add one)
 .env
+
+# Log files
 *.log
+
+# IDE/editor settings
 .vscode/
-.idea/ 
+.idea/
+
+# Build output (only if you ever use a bundler)
+dist/
+out/
+build/
+
+# OS metadata
+Thumbs.db
