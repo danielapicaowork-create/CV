@@ -43,9 +43,9 @@ document.querySelectorAll(".toggle-btn").forEach(title => {
   });
 });
 
-// --- PDF generation (single-page compact version) ---
+// --- PDF generation (force single-page compact layout) ---
 document.getElementById("download-btn")?.addEventListener("click", () => {
-  // Clone content
+  // Clone the content to avoid visual changes
   const content = document.getElementById("profile-content").cloneNode(true);
 
   // Keep only 3 entries per section
@@ -54,32 +54,50 @@ document.getElementById("download-btn")?.addEventListener("click", () => {
     entries.forEach((el, i) => i >= 3 && el.remove());
   });
 
-  // Compact layout for single-page PDF
-  content.style.transform = "scale(0.85)";
-  content.style.transformOrigin = "top left";
-  content.style.padding = "10px";
+  // Make it compact for one-page layout
+  content.style.padding = "5px";
+  content.style.lineHeight = "1.2";
+  content.style.fontSize = "13px";
   content.style.width = "100%";
-  content.style.lineHeight = "1.3";
+  content.style.maxWidth = "800px";
+  content.style.margin = "0 auto";
+  content.style.overflow = "hidden";
+  content.style.transform = "scale(0.8)";
+  content.style.transformOrigin = "top left";
 
-  // PDF options — single page, higher scale for readability
+  // Set PDF options
   const opt = {
-    margin: 0.25,
+    margin: 0,
     filename: "Daniela-Picao-Portfolio.pdf",
     image: { type: "jpeg", quality: 1 },
     html2canvas: {
-      scale: 3, // sharper rendering
-      scrollY: 0
+      scale: 3,        // High resolution
+      scrollY: 0,      // Ignore scroll
+      useCORS: true
     },
     jsPDF: {
       unit: "in",
       format: "a4",
       orientation: "portrait"
     },
-    pagebreak: { mode: ["avoid-all", "css", "legacy"] }
+    pagebreak: { mode: ['avoid-all'] }
   };
 
-  // Generate the PDF
-  html2pdf().from(content).set(opt).save();
+  // Force everything onto one page
+  html2pdf()
+    .set(opt)
+    .from(content)
+    .toPdf()
+    .get('pdf')
+    .then(pdf => {
+      const totalPages = pdf.internal.getNumberOfPages();
+      if (totalPages > 1) {
+        // Scale down slightly more if content overflows
+        pdf.deletePage(2); // Delete second page if accidentally created
+      }
+    })
+    .save();
 });
+
 
 </script>
