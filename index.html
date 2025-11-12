@@ -91,8 +91,6 @@
 
 <body class="bg-bg-main text-text-secondary text-base leading-relaxed">
 
-  <button id="download-btn">📄 Download PDF</button>
-
   <div id="profile-content" class="max-w-[650px] mx-auto my-20 px-6 sm:px-0">
     <header class="mb-12">
       <div class="flex gap-6 items-center">
@@ -109,14 +107,24 @@
 
       <!-- ABOUT -->
       <section>
-        <h2 class="text-text-primary toggle-btn">About ▾</h2>
+        <h2 class="text-gray-900 cursor-pointer toggle-btn">About ▾</h2>
         <div class="collapsible-content mt-2">
-          <p class="leading-[1.8] text-text-secondary">
+          <p class="leading-relaxed text-gray-600">
             I’m a Senior Designer with over seven years of experience creating digital experiences across diverse roles in the industry.
             Passionate about design systems and operations, I strive to drive efficiency, consistency, and scalability while nurturing
             an empathetic culture that empowers teams to excel.
           </p>
+
+          <!-- Download CV button -->
+          <button id="download-btn" class="mt-4 flex items-center gap-2 bg-black text-white px-4 py-2 rounded-md hover:bg-gray-800 transition">
+            Download CV <span>📥</span>
+          </button>
         </div>
+      </section>
+
+      <!-- CONTACT, EXPERIENCE, CERTIFICATIONS, EDUCATION sections remain unchanged -->
+    </main>
+  </div>
       </section>
 
       <!-- CONTACT -->
