@@ -93,3 +93,14 @@ document.getElementById("download-btn")?.addEventListener("click", () => {
     .save()
     .then(() => tempContainer.remove());
 });
+
+// --- Non-breaking space helper (typography polish) ---
+document.addEventListener("DOMContentLoaded", () => {
+  const selector = "p, h1, h2, h3, li";
+  document.querySelectorAll(selector).forEach(el => {
+    if (el.querySelector("a, button")) return; // skip elements with links or buttons
+    const text = el.innerHTML.trim();
+    el.innerHTML = text.replace(/ ([^ ]+)([.,;!?"]*)$/, "&nbsp;$1$2");
+  });
+});
+
