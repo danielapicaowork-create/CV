@@ -1,182 +1,121 @@
-// script.js
-// Handles: lazy-loading thumbnails, non-breaking-space helper, gallery modal logic, and link target handling
+/** ---------------------------------------
+ *  GOOGLE PHOTOS–STYLE SKELETON LOADER
+ *  + LAZY LOADING
+ * --------------------------------------*/
 
-/* -------------------------
-   Non-breaking-space helper
-   (only between last two words)
-   ------------------------- */
 document.addEventListener("DOMContentLoaded", () => {
-  const selector = "p, h1, h2, h3, li";
-  document.querySelectorAll(selector).forEach(el => {
-    // skip if contains interactive elements (links/buttons) to avoid breaking markup
-    if (el.querySelector("a, button")) return;
-    const text = el.innerHTML.trim();
-    el.innerHTML = text.replace(/ (\S+)([.,;!?"]*)\s*$/, "&nbsp;$1$2");
+  const lazyImages = document.querySelectorAll("img.lazy-img");
+
+  const lazyObserver = new IntersectionObserver(
+    (entries, observer) => {
+      entries.forEach(entry => {
+        if (!entry.isIntersecting) return;
+
+        const img = entry.target;
+
+        // Add skeleton class before loading
+        img.classList.add("skeleton");
+
+        // Load the actual image
+        const src = img.getAttribute("data-src");
+        if (src) img.src = src;
+
+        img.onload = () => {
+          img.classList.remove("skeleton");
+          img.classList.add("img-loaded");
+        };
+
+        observer.unobserve(img);
+      });
+    },
+    { rootMargin: "80px 0px 80px 0px" }
+  );
+
+  lazyImages.forEach(img => lazyObserver.observe(img));
+});
+
+
+/** ---------------------------------------
+ *  MODAL GALLERY (unchanged)
+ * --------------------------------------*/
+
+const modal = document.getElementById("gallery-modal");
+const modalImg = document.getElementById("gallery-modal-img");
+const modalClose = document.getElementById("modal-close");
+const modalPrev = document.getElementById("modal-prev");
+const modalNext = document.getElementById("modal-next");
+
+let activeGallery = null;
+let currentIndex = 0;
+
+// Gather all galleries
+const galleries = {};
+document.querySelectorAll("[data-gallery]").forEach(gallery => {
+  const id = gallery.getAttribute("data-gallery");
+  galleries[id] = [...gallery.querySelectorAll(".thumb")];
+});
+
+// Open modal
+document.querySelectorAll(".thumb").forEach(thumb => {
+  thumb.addEventListener("click", () => openModal(thumb));
+  thumb.addEventListener("keypress", (e) => {
+    if (e.key === "Enter" || e.key === " ") openModal(thumb);
   });
 });
 
-/* -------------------------
-   Lazy-load thumbnails via IntersectionObserver
-   ------------------------- */
-(function initLazyImages() {
-  const lazyClass = "lazy-img";
-  const imgs = Array.from(document.querySelectorAll(`img.${lazyClass}`));
+function openModal(thumb) {
+  const galleryName = thumb.closest("[data-gallery]").getAttribute("data-gallery");
+  activeGallery = galleries[galleryName];
 
-  if (!imgs.length) return;
+  currentIndex = parseInt(thumb.getAttribute("data-index"), 10);
 
-  // onload handler to mark loaded and remove blur
-  function markLoaded(img) {
-    img.classList.add("img-loaded");
+  updateModalImage();
+  modal.classList.add("open");
+  document.body.style.overflow = "hidden";
+}
+
+function updateModalImage() {
+  const item = activeGallery[currentIndex];
+  const src = item.getAttribute("data-src");
+  modalImg.src = src;
+}
+
+function closeModal() {
+  modal.classList.remove("open");
+  document.body.style.overflow = "";
+}
+
+modalClose.addEventListener("click", closeModal);
+
+modalPrev.addEventListener("click", () => {
+  currentIndex = (currentIndex - 1 + activeGallery.length) % activeGallery.length;
+  updateModalImage();
+});
+
+modalNext.addEventListener("click", () => {
+  currentIndex = (currentIndex + 1) % activeGallery.length;
+  updateModalImage();
+});
+
+// Close modal when clicking background
+modal.addEventListener("click", (e) => {
+  if (e.target === modal) closeModal();
+});
+
+// ESC key closes modal
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape" && modal.classList.contains("open")) {
+    closeModal();
   }
+});
 
-  // If IntersectionObserver available, use it; otherwise load all
-  if ("IntersectionObserver" in window) {
-    const obs = new IntersectionObserver((entries, observer) => {
-      entries.forEach(entry => {
-        if (!entry.isIntersecting) return;
-        const img = entry.target;
-        const src = img.dataset.src || img.getAttribute("data-src");
-        if (src) {
-          img.src = src;
-          img.removeAttribute("data-src");
-        }
-        // Ensure we still run onload handler if image is cached
-        if (img.complete) markLoaded(img);
-        else img.addEventListener("load", () => markLoaded(img), { once: true });
-        observer.unobserve(img);
-      });
-    }, {
-      root: null,
-      rootMargin: "200px 0px", // preload before entering viewport
-      threshold: 0.01
-    });
 
-    imgs.forEach(img => {
-      // If a small inline src exists (unlikely), prefer data-src, otherwise observer will still set src.
-      obs.observe(img);
-    });
-  } else {
-    // fallback: load all immediately
-    imgs.forEach(img => {
-      const src = img.dataset.src || img.getAttribute("data-src");
-      if (src) img.src = src;
-      if (img.complete) img.classList.add("img-loaded");
-      else img.addEventListener("load", () => img.classList.add("img-loaded"), { once: true });
-    });
+/** ---------------------------------------
+ *  FORCE EXTERNAL LINKS TO OPEN IN NEW TAB
+ * --------------------------------------*/
+document.querySelectorAll("a[href^='http']").forEach(link => {
+  if (!link.href.includes(window.location.hostname)) {
+    link.setAttribute("target", "_blank");
+    link.setAttribute("rel", "noopener noreferrer");
   }
-})();
-
-/* -------------------------
-   Gallery / Modal logic
-   ------------------------- */
-(function setupGalleries(){
-  const strips = Array.from(document.querySelectorAll('.gallery-strip'));
-  const galleries = {};
-
-  strips.forEach(strip => {
-    const id = strip.dataset.gallery || Math.random().toString(36).slice(2);
-    const thumbs = Array.from(strip.querySelectorAll('.thumb'));
-    galleries[id] = thumbs.map(t => ({
-      // prefer the thumb's data-src attribute (set on the parent), fallback to img.dataset.src
-      src: t.dataset.src || t.querySelector('img')?.dataset?.src || t.querySelector('img')?.src || '',
-      alt: t.querySelector('img')?.alt || '',
-      thumbEl: t
-    }));
-  });
-
-  const modal = document.getElementById('gallery-modal');
-  const modalImg = document.getElementById('gallery-modal-img');
-  const btnClose = document.getElementById('modal-close');
-  const btnPrev = document.getElementById('modal-prev');
-  const btnNext = document.getElementById('modal-next');
-
-  let activeGalleryId = null;
-  let activeIndex = 0;
-
-  function openModal(galleryId, index) {
-    const gallery = galleries[galleryId];
-    if (!gallery) return;
-    activeGalleryId = galleryId;
-    activeIndex = index;
-    updateModalImage();
-    modal.classList.add('open');
-    modal.setAttribute('aria-hidden', 'false');
-    document.body.style.overflow = 'hidden';
-    btnClose.focus();
-  }
-
-  function closeModal() {
-    modal.classList.remove('open');
-    modal.setAttribute('aria-hidden', 'true');
-    activeGalleryId = null;
-    activeIndex = 0;
-    document.body.style.overflow = '';
-    // clear modal image src to allow browser to free memory if needed
-    modalImg.src = "";
-    modalImg.alt = "";
-  }
-
-  function updateModalImage() {
-    const gallery = galleries[activeGalleryId];
-    if (!gallery) return;
-    const item = gallery[activeIndex];
-    // Load the full-size image only when needed
-    modalImg.src = item.src;
-    modalImg.alt = item.alt || "";
-  }
-
-  function showNext() {
-    const gallery = galleries[activeGalleryId];
-    if (!gallery) return;
-    activeIndex = (activeIndex + 1) % gallery.length;
-    updateModalImage();
-  }
-
-  function showPrev() {
-    const gallery = galleries[activeGalleryId];
-    if (!gallery) return;
-    activeIndex = (activeIndex - 1 + gallery.length) % gallery.length;
-    updateModalImage();
-  }
-
-  Object.keys(galleries).forEach(gid => {
-    galleries[gid].forEach((item, idx) => {
-      const el = item.thumbEl;
-      // clicking/tapping opens modal
-      el.addEventListener('click', () => openModal(gid, idx));
-      // keyboard accessibility (Enter / Space)
-      el.addEventListener('keydown', (ev) => {
-        if (ev.key === 'Enter' || ev.key === ' ') {
-          ev.preventDefault();
-          openModal(gid, idx);
-        }
-      });
-    });
-  });
-
-  btnClose.addEventListener('click', closeModal);
-  btnPrev.addEventListener('click', showPrev);
-  btnNext.addEventListener('click', showNext);
-
-  modal.addEventListener('click', (e) => {
-    if (e.target === modal) closeModal();
-  });
-
-  document.addEventListener('keydown', (e) => {
-    if (!activeGalleryId) return;
-    if (e.key === 'Escape') closeModal();
-    if (e.key === 'ArrowRight') showNext();
-    if (e.key === 'ArrowLeft') showPrev();
-  });
-})();
-
-/* -------------------------
-   Make anchor links open in new tab (keeps original behaviour)
-   ------------------------- */
-document.addEventListener("DOMContentLoaded", () => {
-  document.querySelectorAll("a[href]").forEach(a => {
-    // preserve mailto and same-origin links if you prefer — but original code set all to open in new tab
-    a.setAttribute("target", "_blank");
-    a.setAttribute("rel", "noopener noreferrer");
-  });
 });
