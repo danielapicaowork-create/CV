@@ -172,20 +172,25 @@
       position: relative;
     }
 
-    .thumb img {
+    /* lazy image styling: subtle fade/blur as it loads */
+    .lazy-img {
       width: 100%;
       height: 100%;
       object-fit: cover;
       display: block;
       transform-origin: center;
-      transition: transform .25s ease;
+      transition: transform .25s ease, opacity .35s ease, filter .35s ease;
+      opacity: 0;
+      filter: blur(6px);
+    }
+    .lazy-img.img-loaded {
+      opacity: 1;
+      filter: blur(0);
     }
 
     .thumb:active img,
     .thumb:focus img,
     .thumb:hover img { transform: scale(1.02); }
-
- 
 
     /* Modal (shared for all galleries) */
     .gallery-modal {
@@ -263,7 +268,8 @@
 
     <header class="mb-12">
       <div class="flex gap-6 items-center">
-        <img src="images/profilePhoto.jpg" alt="Daniela Picão" class="w-[132px] h-[132px] rounded-full" loading="lazy" />
+        <!-- profile photo kept high-priority so header looks immediate -->
+        <img src="images/profilePhoto.jpg" alt="Daniela Picão" class="w-[132px] h-[132px] rounded-full" loading="eager" fetchpriority="high" />
         <div class="flex-1">
           <h1 class="text-2xl mb-1 text-text-primary">Daniela Picão</h1>
           <p class="text-text-secondary mb-2">Sr. Product Designer in London, UK</p>
@@ -349,13 +355,13 @@
                 <div class="gallery-strip" data-gallery="soldo-senior">
                   <div class="gallery-track">
                     <div class="thumb" tabindex="0" data-src="images/Senior-Product-Designer-Design-System-at-Soldo-1.png" data-index="0">
-                      <img src="images/Senior-Product-Designer-Design-System-at-Soldo-1.png" alt="Soldo senior 1" />
+                      <img data-src="images/Senior-Product-Designer-Design-System-at-Soldo-1.png" alt="Soldo senior 1" class="lazy-img" loading="lazy" fetchpriority="low" />
                     </div>
                     <div class="thumb" tabindex="0" data-src="images/Senior-Product-Designer-Design-System-at-Soldo-2.png" data-index="1">
-                      <img src="images/Senior-Product-Designer-Design-System-at-Soldo-2.png" alt="Soldo senior 2" />
+                      <img data-src="images/Senior-Product-Designer-Design-System-at-Soldo-2.png" alt="Soldo senior 2" class="lazy-img" loading="lazy" fetchpriority="low" />
                     </div>
                     <div class="thumb" tabindex="0" data-src="images/Senior-Product-Designer-Design-System-at-Soldo-3.png" data-index="2">
-                      <img src="images/Senior-Product-Designer-Design-System-at-Soldo-3.png" alt="Soldo senior 3" />
+                      <img data-src="images/Senior-Product-Designer-Design-System-at-Soldo-3.png" alt="Soldo senior 3" class="lazy-img" loading="lazy" fetchpriority="low" />
                     </div>
                   </div>
                 </div>
@@ -384,13 +390,13 @@
                 <div class="gallery-strip" data-gallery="soldo-ui">
                   <div class="gallery-track">
                     <div class="thumb" tabindex="0" data-src="images/UI-Designer-and-Design-System-contributor-at-Soldo-1.png" data-index="0">
-                      <img src="images/UI-Designer-and-Design-System-contributor-at-Soldo-1.png" alt="Soldo ui 1" />
+                      <img data-src="images/UI-Designer-and-Design-System-contributor-at-Soldo-1.png" alt="Soldo ui 1" class="lazy-img" loading="lazy" fetchpriority="low" />
                     </div>
                     <div class="thumb" tabindex="0" data-src="images/UI-Designer-and-Design-System-contributor-at-Soldo-2.png" data-index="1">
-                      <img src="images/UI-Designer-and-Design-System-contributor-at-Soldo-2.png" alt="Soldo ui 2" />
+                      <img data-src="images/UI-Designer-and-Design-System-contributor-at-Soldo-2.png" alt="Soldo ui 2" class="lazy-img" loading="lazy" fetchpriority="low" />
                     </div>
                     <div class="thumb" tabindex="0" data-src="images/UI-Designer-and-Design-System-contributor-at-Soldo-3.png" data-index="2">
-                      <img src="images/UI-Designer-and-Design-System-contributor-at-Soldo-3.png" alt="Soldo ui 3" />
+                      <img data-src="images/UI-Designer-and-Design-System-contributor-at-Soldo-3.png" alt="Soldo ui 3" class="lazy-img" loading="lazy" fetchpriority="low" />
                     </div>
                   </div>
                 </div>
@@ -416,19 +422,19 @@
                 <div class="gallery-strip" data-gallery="play">
                   <div class="gallery-track">
                     <div class="thumb" tabindex="0" data-src="images/UXUI-Designer-at-Play-Consulting-1.png" data-index="0">
-                      <img src="images/UXUI-Designer-at-Play-Consulting-1.png" alt="Play 1" />
+                      <img data-src="images/UXUI-Designer-at-Play-Consulting-1.png" alt="Play 1" class="lazy-img" loading="lazy" fetchpriority="low" />
                     </div>
                     <div class="thumb" tabindex="0" data-src="images/UXUI-Designer-at-Play-Consulting-2.png" data-index="1">
-                      <img src="images/UXUI-Designer-at-Play-Consulting-2.png" alt="Play 2" />
+                      <img data-src="images/UXUI-Designer-at-Play-Consulting-2.png" alt="Play 2" class="lazy-img" loading="lazy" fetchpriority="low" />
                     </div>
                     <div class="thumb" tabindex="0" data-src="images/UXUI-Designer-at-Play-Consulting-3.png" data-index="2">
-                      <img src="images/UXUI-Designer-at-Play-Consulting-3.png" alt="Play 3" />
+                      <img data-src="images/UXUI-Designer-at-Play-Consulting-3.png" alt="Play 3" class="lazy-img" loading="lazy" fetchpriority="low" />
                     </div>
                     <div class="thumb" tabindex="0" data-src="images/UXUI-Designer-at-Play-Consulting-4.png" data-index="3">
-                      <img src="images/UXUI-Designer-at-Play-Consulting-4.png" alt="Play 4" />
+                      <img data-src="images/UXUI-Designer-at-Play-Consulting-4.png" alt="Play 4" class="lazy-img" loading="lazy" fetchpriority="low" />
                     </div>
                     <div class="thumb" tabindex="0" data-src="images/UXUI-Designer-at-Play-Consulting-5.png" data-index="4">
-                      <img src="images/UXUI-Designer-at-Play-Consulting-5.png" alt="Play 5" />
+                      <img data-src="images/UXUI-Designer-at-Play-Consulting-5.png" alt="Play 5" class="lazy-img" loading="lazy" fetchpriority="low" />
                     </div>
                   </div>
                 </div>
@@ -502,28 +508,28 @@
                 <div class="gallery-strip" data-gallery="tom-price">
                   <div class="gallery-track">
                     <div class="thumb" tabindex="0" data-src="images/Creative-Assistant-Internship-at-Tom-Price-1.jpg" data-index="0">
-                      <img src="images/Creative-Assistant-Internship-at-Tom-Price-1.jpg" alt="Tom Price 1" />
+                      <img data-src="images/Creative-Assistant-Internship-at-Tom-Price-1.jpg" alt="Tom Price 1" class="lazy-img" loading="lazy" fetchpriority="low" />
                     </div>
                     <div class="thumb" tabindex="0" data-src="images/Creative-Assistant-Internship-at-Tom-Price-2.jpg" data-index="1">
-                      <img src="images/Creative-Assistant-Internship-at-Tom-Price-2.jpg" alt="Tom Price 2" />
+                      <img data-src="images/Creative-Assistant-Internship-at-Tom-Price-2.jpg" alt="Tom Price 2" class="lazy-img" loading="lazy" fetchpriority="low" />
                     </div>
                     <div class="thumb" tabindex="0" data-src="images/Creative-Assistant-Internship-at-Tom-Price-3.jpg" data-index="2">
-                      <img src="images/Creative-Assistant-Internship-at-Tom-Price-3.jpg" alt="Tom Price 3" />
+                      <img data-src="images/Creative-Assistant-Internship-at-Tom-Price-3.jpg" alt="Tom Price 3" class="lazy-img" loading="lazy" fetchpriority="low" />
                     </div>
                     <div class="thumb" tabindex="0" data-src="images/Creative-Assistant-Internship-at-Tom-Price-4.jpg" data-index="3">
-                      <img src="images/Creative-Assistant-Internship-at-Tom-Price-4.jpg" alt="Tom Price 4" />
+                      <img data-src="images/Creative-Assistant-Internship-at-Tom-Price-4.jpg" alt="Tom Price 4" class="lazy-img" loading="lazy" fetchpriority="low" />
                     </div>
                     <div class="thumb" tabindex="0" data-src="images/Creative-Assistant-Internship-at-Tom-Price-5.jpg" data-index="4">
-                      <img src="images/Creative-Assistant-Internship-at-Tom-Price-5.jpg" alt="Tom Price 5" />
+                      <img data-src="images/Creative-Assistant-Internship-at-Tom-Price-5.jpg" alt="Tom Price 5" class="lazy-img" loading="lazy" fetchpriority="low" />
                     </div>
                     <div class="thumb" tabindex="0" data-src="images/Creative-Assistant-Internship-at-Tom-Price-6.jpg" data-index="5">
-                      <img src="images/Creative-Assistant-Internship-at-Tom-Price-6.jpg" alt="Tom Price 6" />
+                      <img data-src="images/Creative-Assistant-Internship-at-Tom-Price-6.jpg" alt="Tom Price 6" class="lazy-img" loading="lazy" fetchpriority="low" />
                     </div>
                     <div class="thumb" tabindex="0" data-src="images/Creative-Assistant-Internship-at-Tom-Price-7.jpg" data-index="6">
-                      <img src="images/Creative-Assistant-Internship-at-Tom-Price-7.jpg" alt="Tom Price 7" />
+                      <img data-src="images/Creative-Assistant-Internship-at-Tom-Price-7.jpg" alt="Tom Price 7" class="lazy-img" loading="lazy" fetchpriority="low" />
                     </div>
                     <div class="thumb" tabindex="0" data-src="images/Creative-Assistant-Internship-at-Tom-Price-8.jpg" data-index="7">
-                      <img src="images/Creative-Assistant-Internship-at-Tom-Price-8.jpg" alt="Tom Price 8" />
+                      <img data-src="images/Creative-Assistant-Internship-at-Tom-Price-8.jpg" alt="Tom Price 8" class="lazy-img" loading="lazy" fetchpriority="low" />
                     </div>
                   </div>
                 </div>
